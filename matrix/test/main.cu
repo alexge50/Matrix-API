@@ -1,5 +1,6 @@
 #include <iostream>
-#include "cuda-indexing.h"
+#include "../src/cuda-indexing.h"
+#include <Matrix.h>
 
 __global__
 void multiply_matrix(int n, float *a, float *b, float *c)
@@ -17,7 +18,7 @@ void multiply_matrix(int n, float *a, float *b, float *c)
 
 int main()
 {
-    int n = 100;
+    int n = 10000;
     float *a, *b, *c;
     cudaMallocManaged(&a, n * n * sizeof(float));
     cudaMallocManaged(&b, n * n * sizeof(float));
@@ -32,15 +33,15 @@ int main()
         }
     }
 
-    multiply_matrix<<<n, n>>>(n, a, b, c);
+    multiply_matrix<<<(n + 128 - 1) / 128, 128>>>(n, a, b, c);
     cudaDeviceSynchronize();
 
-    for(int i = 0; i < n; i++)
+    /*for(int i = 0; i < n; i++)
     {
         for(int j = 0; j < n; j++)
             std::cout << b[i * n + j] << " ";
         std::cout << "\n";
-    }
+    }*/
 
     cudaFree(a);
     cudaFree(b);
