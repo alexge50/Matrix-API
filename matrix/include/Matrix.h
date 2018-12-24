@@ -5,6 +5,8 @@
 #ifndef MATRIX_COMPUTE_MATRIX_H
 #define MATRIX_COMPUTE_MATRIX_H
 
+#include <cuda-indexing.h>
+
 class SubscriptProxy;
 class Matrix
 {
