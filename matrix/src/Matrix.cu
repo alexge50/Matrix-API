@@ -3,24 +3,30 @@
 //
 
 #include <Matrix.h>
+#include "../include/Matrix.h"
 
 Matrix::Matrix(int n): m_n(n)
 {
-    cudaMallocManaged(&m_matrix, n * n * sizeof(float));
+    cudaMallocManaged(&m_matrix, m_n * m_n * sizeof(float));
 }
 
-SubscriptProxy Matrix::operator[](int line)
+Matrix::~Matrix()
+{
+    cudaFree(m_matrix);
+}
+
+__host__ __device__ SubscriptProxy Matrix::operator[](int line)
 {
     return SubscriptProxy(m_n, line, m_matrix);
 }
 
-SubscriptProxy::SubscriptProxy(int n, int line, float *matrix):
+__host__ __device__ SubscriptProxy::SubscriptProxy(int n, int line, float *matrix):
     m_n(n),
     m_line(line),
     m_matrix(matrix)
 {}
 
-SubscriptProxy::SubscriptProxy(SubscriptProxy &&other):
+__host__ __device__ SubscriptProxy::SubscriptProxy(SubscriptProxy &&other):
     m_matrix(other.m_matrix),
     m_n(other.m_n),
     m_line(other.m_line)
@@ -30,7 +36,7 @@ SubscriptProxy::SubscriptProxy(SubscriptProxy &&other):
     other.m_n = 0;
 }
 
-float& SubscriptProxy::operator[](int column)
+__host__ __device__ float& SubscriptProxy::operator[](int column)
 {
     return m_matrix[m_line * m_n + column];
 }
