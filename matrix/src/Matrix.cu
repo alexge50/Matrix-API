@@ -3,11 +3,30 @@
 //
 
 #include <Matrix.h>
+#include <cuda-indexing.h>
 #include "../include/Matrix.h"
+
+#include <cstring>
 
 Matrix::Matrix(int n): m_n(n)
 {
     cudaMallocManaged(&m_matrix, m_n * m_n * sizeof(float));
+}
+
+Matrix::Matrix(const Matrix &other)
+{
+    m_n = other.m_n;
+    cudaMallocManaged(&m_matrix, m_n * m_n * sizeof(float));
+
+    std::memcpy(m_matrix, other.m_matrix, m_n * m_n * sizeof(float));
+}
+
+Matrix::Matrix(Matrix &&other):
+    m_matrix(other.m_matrix),
+    m_n(other.m_n)
+{
+    m_matrix = nullptr;
+    m_n = 0;
 }
 
 Matrix::~Matrix()
@@ -16,6 +35,16 @@ Matrix::~Matrix()
 }
 
 __host__ __device__ SubscriptProxy Matrix::operator[](int line)
+{
+    return SubscriptProxy(m_n, line, m_matrix);
+}
+
+MatrixRef::MatrixRef(float *matrix, int n):
+    m_matrix(matrix),
+    m_n(n)
+{}
+
+__host__ __device__ SubscriptProxy MatrixRef::operator[](int line)
 {
     return SubscriptProxy(m_n, line, m_matrix);
 }
