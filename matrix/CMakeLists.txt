@@ -12,6 +12,8 @@ set(source
         src/Multiplication.cu
         )
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 add_library(matrix-compute STATIC ${source})
 set_target_properties(matrix-compute PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 
