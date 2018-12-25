@@ -8,6 +8,8 @@ include_directories(include)
 set(source
         include/Matrix.h
         src/Matrix.cu
+        include/Multiplication.h
+        src/Multiplication.cu
         )
 
 add_library(matrix-compute STATIC ${source})
