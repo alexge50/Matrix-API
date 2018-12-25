@@ -8,6 +8,7 @@
 #include <cuda-indexing.h>
 
 class SubscriptProxy;
+class MatrixRef;
 class Matrix
 {
 public:
@@ -19,6 +20,9 @@ public:
     ~Matrix();
 
     __host__ __device__ SubscriptProxy operator[](int line);
+    __host__ __device__ int order() const;
+
+    MatrixRef &&ref();
 
 private:
     float *m_matrix;
@@ -29,6 +33,8 @@ class MatrixRef
 {
 private:
     MatrixRef(float *matrix, int n);
+    friend Matrix;
+
 public:
     MatrixRef() = delete;
     MatrixRef(const MatrixRef &) = default;
@@ -37,6 +43,7 @@ public:
     ~MatrixRef() = default;
 
     __host__ __device__ SubscriptProxy operator[](int line);
+    __host__ __device__ int order() const;
 
 private:
     float *m_matrix;
